@@ -1,0 +1,171 @@
+version: '3.8'
+services:
+  db:
+    image: mongo:6.0.5
+    container_name: db
+    environment:
+      - MONGO_INITDB_HOSTNAME=$MONGO_INITDB_HOSTNAME
+      - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
+      - MONGO_INITDB_USERNAME=$MONGO_INITDB_USERNAME
+      - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
+    volumes:
+      - ./backend/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./backend/db/mongo-volume:/data/db
+    network_mode: host
+    command: mongod --quiet
+    restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok && exit()' | mongosh --quiet
+      interval: 10s
+      timeout: 20s
+      retries: 50
+      start_period: 30s
+  broker:
+    image: eclipse-mosquitto:2.0.18-openssl
+    container_name: avorus-broker
+    volumes:
+      - ./backend/broker/mosquitto/config:/mosquitto/config
+      - ./backend/broker/tls:/opt/tls
+    network_mode: host
+    restart: always
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "mosquitto_sub -h localhost -p 8883 -t '#' --cafile /opt/tls/CertAuth.crt --cert /opt/tls/server.crt --key /opt/tls/server.key -E -i healthcheck | grep -v Error && exit 1 || exit 0",
+        ]
+      interval: 10s
+      timeout: 5s
+  api:
+    image: avorus-api
+    build: ./backend/api
+    container_name: avorus-api
+    environment:
+      - MONGO_INITDB_USERNAME=$MONGO_INITDB_USERNAME
+      - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
+      - MONGO_INITDB_HOSTNAME=$MONGO_INITDB_HOSTNAME
+      - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
+      - MQTT_HOSTNAME=$MQTT_HOSTNAME
+      - API_SECRET=$API_SECRET
+      - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
+      - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
+      - NETBOX_API_URL=$NETBOX_API_URL
+      - NETBOX_API_TOKEN=$NETBOX_API_TOKEN
+    volumes:
+      - ./backend/api:/api
+      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs:/opt/certs
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    command: uvicorn app:app --reload --host 0.0.0.0 --port 80 --port 443 --ssl-keyfile /opt/certs/${API_HOSTNAME}+2-key.pem --ssl-certfile /opt/certs/${HOSTNAME}+2.pem
+    restart: always
+    depends_on:
+      broker:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail --insecure https://localhost:443/healthcheck
+      interval: 120s
+      timeout: 120s
+      retries: 5
+      start_period: 5s
+  manager:
+    image: avorus-manager
+    build: ./backend/manager
+    container_name: avorus-manager
+    environment:
+      - MQTT_HOSTNAME=$MQTT_HOSTNAME
+      - MONGO_INITDB_HOSTNAME=$MONGO_INITDB_HOSTNAME
+      - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
+      - MONGO_INITDB_USERNAME=$MONGO_INITDB_USERNAME
+      - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
+      - API_HOSTNAME=$API_HOSTNAME
+      - API_ROOT_CA=$API_ROOT_CA
+      - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
+      - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
+      - PJLINK_PASSWORD=$PJLINK_PASSWORD
+    volumes:
+      - ./backend/manager:/app
+      - ./backend/broker/tls:/opt/tls
+      - $API_ROOT_CA:$API_ROOT_CA
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    privileged: true
+    command: python3 /app/app.py
+    restart: always
+    depends_on:
+      broker:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+  calendar:
+    image: avorus-calendar
+    build: ./backend/calendar
+    container_name: avorus-calendar
+    environment:
+      - MQTT_HOSTNAME=$MQTT_HOSTNAME
+      - MONGO_INITDB_HOSTNAME=$MONGO_INITDB_HOSTNAME
+      - MONGO_INITDB_DATABASE=$MONGO_INITDB_DATABASE
+      - MONGO_INITDB_USERNAME=$MONGO_INITDB_USERNAME
+      - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
+    volumes:
+      - ./backend/calendar:/app
+      - ./backend/broker/tls:/opt/tls
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    command: python3 /app/app.py
+    restart: always
+    depends_on:
+      broker:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+  knx:
+    image: avorus-knx
+    build: ./backend/knx
+    container_name: avorus-knx
+    environment:
+      - MQTT_HOSTNAME=$MQTT_HOSTNAME
+      - API_HOSTNAME=$API_HOSTNAME
+      - API_ROOT_CA=$API_ROOT_CA
+      - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
+      - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
+      - KNX_GATEWAY_IP=$KNX_GATEWAY_IP
+      - KNXKEYS_FILE_PATH=$KNXKEYS_FILE_PATH
+      - KNXKEYS_PASSWORD=$KNXKEYS_PASSWORD
+    volumes:
+      - ./backend/knx:/app
+      - ./backend/broker/tls:/opt/tls
+      - $API_ROOT_CA:$API_ROOT_CA
+    network_mode: host
+    command: python3 /app/app.py
+    restart: always
+    depends_on:
+      broker:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+  fac:
+    image: avorus-fac
+    build: ./backend/fac
+    container_name: avorus-fac
+    environment:
+      - MQTT_HOSTNAME=$MQTT_HOSTNAME
+    volumes:
+      - ./backend/fac:/app
+      - ./backend/broker/tls:/opt/tls
+    network_mode: host
+    command: python3 /app/app.py
+    restart: always
+    depends_on:
+      broker:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+networks:
+  pubsub:
+    driver: bridge

@@ -1,0 +1,30 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/avorus-soft/avorus-ui.git
+[submodule "backend/db"]
+	path = backend/db
+	url = https://github.com/avorus-soft/avorus-db.git
+[submodule "backend/broker"]
+	path = backend/broker
+	url = https://github.com/avorus-soft/avorus-broker.git
+[submodule "backend/fac"]
+	path = backend/fac
+	url = https://github.com/avorus-soft/avorus-fac.git
+[submodule "backend/knx"]
+	path = backend/knx
+	url = https://github.com/avorus-soft/avorus-knx.git
+[submodule "backend/calendar"]
+	path = backend/calendar
+	url = https://github.com/avorus-soft/avorus-calendar.git
+[submodule "backend/manager"]
+	path = backend/manager
+	url = https://github.com/avorus-soft/avorus-manager.git
+[submodule "backend/api"]
+	path = backend/api
+	url = https://github.com/avorus-soft/avorus-api.git
+[submodule "backend/mkcert"]
+	path = backend/mkcert
+	url = https://github.com/avorus-soft/avorus-mkcert.git
+[submodule "maintenance/docker-watchdog"]
+	path = maintenance/docker-watchdog
+	url = https://github.com/avorus-soft/avorus-docker-watchdog.git

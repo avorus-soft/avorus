@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  mkcert:
+    image: mkcert
+    build: ./backend/mkcert
+    container_name: mkcert
+    volumes:
+      - ./backend/mkcert/certs:/root
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    command: mkcert $API_HOSTNAME 127.0.0.1 localhost
