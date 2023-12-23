@@ -4,8 +4,11 @@ services:
     image: mkcert
     build: ./backend/mkcert
     container_name: mkcert
+    environment:
+      - API_HOSTNAME=$API_HOSTNAME
+      - CN=$MQTT_HOSTNAME
     volumes:
       - ./backend/mkcert/certs:/root
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    command: mkcert $API_HOSTNAME 127.0.0.1 localhost
+    command: ./mkcerts.sh
