@@ -11,4 +11,4 @@ services:
       - ./backend/mkcert/certs:/root
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    command: ./mkcerts.sh
+    command: /mkcerts.sh

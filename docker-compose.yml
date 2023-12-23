@@ -25,7 +25,7 @@ services:
     container_name: avorus-broker
     volumes:
       - ./backend/broker/mosquitto/config:/mosquitto/config
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
     network_mode: host
     restart: always
     healthcheck:
@@ -58,7 +58,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
-    command: uvicorn app:app --reload --host 0.0.0.0 --port 80 --port 443 --ssl-keyfile /opt/certs/${API_HOSTNAME}+2-key.pem --ssl-certfile /opt/certs/${HOSTNAME}+2.pem
+    command: uvicorn app:app --reload --host 0.0.0.0 --port 80 --port 443 --ssl-keyfile /opt/certs/${API_HOSTNAME}+2-key.pem --ssl-certfile /opt/certs/${API_HOSTNAME}+2.pem
     restart: always
     depends_on:
       broker:
@@ -82,7 +82,7 @@ services:
       - MONGO_INITDB_USERNAME=$MONGO_INITDB_USERNAME
       - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
       - API_HOSTNAME=$API_HOSTNAME
-      - API_ROOT_CA=$API_ROOT_CA
+      - API_ROOT_CA=/opt/rootCA.pem
       - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
       - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
       - PJLINK_PASSWORD=$PJLINK_PASSWORD
@@ -90,7 +90,7 @@ services:
     volumes:
       - ./backend/manager:/app
       - ./backend/broker/tls:/opt/tls
-      - $API_ROOT_CA:$API_ROOT_CA
+      - ./backend/mkcert/certs/rootCA.pem:/opt/rootCA.pem
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
@@ -132,7 +132,7 @@ services:
     environment:
       - MQTT_HOSTNAME=$MQTT_HOSTNAME
       - API_HOSTNAME=$API_HOSTNAME
-      - API_ROOT_CA=$API_ROOT_CA
+      - API_ROOT_CA=/opt/rootCA.pem
       - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
       - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
       - KNX_GATEWAY_IP=$KNX_GATEWAY_IP
@@ -141,7 +141,7 @@ services:
     volumes:
       - ./backend/knx:/app
       - ./backend/broker/tls:/opt/tls
-      - $API_ROOT_CA:$API_ROOT_CA
+      - ./backend/mkcert/certs/rootCA.pem:/opt/rootCA.pem
     network_mode: host
     command: python3 /app/app.py
     restart: always
