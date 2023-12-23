@@ -1,31 +1,47 @@
 #!/bin/bash
 
-# Initialize a flag to determine if we are inside the 'avorus' repo
-inside_avorus_repo=false
+# Define the expected Git repository URL
+REPO_URL="https://github.com/avorus-soft/avorus"
 
-# Check if we're in the 'avorus' repo
-if [ -f "install/install.sh" ]; then
+# Check whether .git/config exists and contains the expected URL
+if [ -d ".git" ] && grep -q "$REPO_URL" .git/config; then
   inside_avorus_repo=true
+else
+  inside_avorus_repo=false
 fi
+
 
 if [ "$inside_avorus_repo" = false ]; then
   git clone -j8 --recurse-submodules https://github.com/avorus-soft/avorus
   cd avorus || exit
 fi
 
-# Define function to check and touch flag files
-check_and_touch() {
-  if [ ! -f "$1" ]; then
-    $2 && touch "$1"
+scripts=("./install/env_setup.sh" "./install/ssl_setup.sh" "./install/docker_build.sh" "./install/setup_user.sh" "./install/frontend_setup.sh")
+
+for script in "${scripts[@]}"; do
+  # Check if the script has been executed successfully in a previous run
+  flag_file="${script}.done"
+
+  if [ ! -e "$flag_file" ]; then
+    read -p "Do you want to run $script interactively? (y/n): " -n 1 -r
+    echo # Move to a new line
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      # Run the script interactively
+      if ./"$script"; then
+        # Only create the flag file if the script executed successfully
+        touch "$flag_file"
+      else
+        echo "$script failed. Exiting the installation."
+        exit 1
+      fi
+    else
+      echo "Skipping $script..."
+    fi
   else
-    echo "Skipping step, $1 exists."
+    echo "$script has already been run successfully."
   fi
-}
+done
 
-check_and_touch "env_setup.flag" "./install/env_setup.sh"
-check_and_touch "ssl_setup.flag" "./install/ssl_setup.sh"
-check_and_touch "docker_build.flag" "docker compose build"
-check_and_touch "init_user.flag" "docker compose run -it --rm api python3 init_user.py"
+echo "Done!"
 
-# Set up the frontend
-check_and_touch "frontend_setup.flag" "./install/frontend_setup.sh"
