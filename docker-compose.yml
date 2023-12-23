@@ -53,7 +53,7 @@ services:
       - NETBOX_API_TOKEN=$NETBOX_API_TOKEN
     volumes:
       - ./backend/api:/api
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
       - ./backend/mkcert/certs:/opt/certs
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -89,7 +89,7 @@ services:
       - PDU_COMMUNITYSTRING=$PDU_COMMUNITYSTRING
     volumes:
       - ./backend/manager:/app
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
       - ./backend/mkcert/certs/rootCA.pem:/opt/rootCA.pem
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -114,7 +114,7 @@ services:
       - MONGO_INITDB_PASSWORD=$MONGO_INITDB_PASSWORD
     volumes:
       - ./backend/calendar:/app
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     network_mode: host
@@ -140,7 +140,7 @@ services:
       - KNXKEYS_PASSWORD=$KNXKEYS_PASSWORD
     volumes:
       - ./backend/knx:/app
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
       - ./backend/mkcert/certs/rootCA.pem:/opt/rootCA.pem
     network_mode: host
     command: python3 /app/app.py
@@ -159,7 +159,7 @@ services:
       - FAC_COMMUNITYSTRING=$FAC_COMMUNITYSTRING
     volumes:
       - ./backend/fac:/app
-      - ./backend/broker/tls:/opt/tls
+      - ./backend/mkcert/certs/mqtt:/opt/tls
     network_mode: host
     command: python3 /app/app.py
     restart: always
