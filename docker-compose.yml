@@ -86,6 +86,7 @@ services:
       - API_SYSTEM_USERNAME=$API_SYSTEM_USERNAME
       - API_SYSTEM_PASSWORD=$API_SYSTEM_PASSWORD
       - PJLINK_PASSWORD=$PJLINK_PASSWORD
+      - PDU_COMMUNITYSTRING=$PDU_COMMUNITYSTRING
     volumes:
       - ./backend/manager:/app
       - ./backend/broker/tls:/opt/tls
@@ -155,6 +156,7 @@ services:
     container_name: avorus-fac
     environment:
       - MQTT_HOSTNAME=$MQTT_HOSTNAME
+      - FAC_COMMUNITYSTRING=$FAC_COMMUNITYSTRING
     volumes:
       - ./backend/fac:/app
       - ./backend/broker/tls:/opt/tls

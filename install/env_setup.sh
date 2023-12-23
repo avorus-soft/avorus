@@ -57,5 +57,7 @@ sed -i "s|# KNX_GATEWAY_IP=|KNX_GATEWAY_IP=${knx_gateway_ip}|g" .env
 sed -i "s|# KNXKEYS_FILE_PATH=|KNXKEYS_FILE_PATH=${knxkeys_file_path}|g" .env
 sed -i "s|# KNXKEYS_PASSWORD=|KNXKEYS_PASSWORD=${knxkeys_password}|g" .env
 sed -i "s|# PJLINK_PASSWORD=|PJLINK_PASSWORD=${pjlink_password}|g" .env
+sed -i "s|# PDU_COMMUNITYSTRING=|PDU_COMMUNITYSTRING=$(generate_random_string)|g" .env
+sed -i "s|# FAC_COMMUNITYSTRING=|FAC_COMMUNITYSTRING=$(generate_random_string)|g" .env
 
 echo ".env file has been created."
