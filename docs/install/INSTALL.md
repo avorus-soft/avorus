@@ -9,7 +9,9 @@
 Run this snippet and follow the propmts that appear on screen:
 
 ```bash
-curl -s https://github.com/avorus-soft/avorus/install/install.sh | bash
+curl -sO https://github.com/avorus-soft/avorus/install/install.sh
+chmod +x install.sh
+./install.sh
 ```
 
 Once it's done, you should be ready to start Avorus as a daemon by running:
