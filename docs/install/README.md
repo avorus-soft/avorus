@@ -8,7 +8,7 @@
 
 ## Automagic install
 
-Run this snippet and follow the propmts that appear on screen:
+Run this snippet and follow the prompts that appear on screen:
 
 > The automatic installer requires `git` and `jq`.<br>
 > If you are using a Debian-like distribution, install these by running:<br> > `sudo apt update && sudo apt install git jq`
