@@ -2,11 +2,16 @@
 
 ## Prerequisites
 
-[Install Docker Engine](docs/install/INSTALL_DOCKER.md) ([Official Manual](https://docs.docker.com/engine/install/))
+[Install Docker Engine](INSTALL_DOCKER.md) ([Official Manual](https://docs.docker.com/engine/install/))
+
+[NetBox](https://netbox.dev/) (e.g. [netbox-docker](https://hub.docker.com/r/netboxcommunity/netbox/))
 
 ## Automagic install
 
 Run this snippet and follow the propmts that appear on screen:
+
+> The automatic installer requires `git` and `jq`.<br>
+> If you are using a Debian-like distribution, install these by running:<br> > `sudo apt update && sudo apt install git jq`
 
 ```bash
 curl -sO https://github.com/avorus-soft/avorus/install/install.sh
@@ -20,7 +25,7 @@ Once it's done, you should be ready to start Avorus as a daemon by running:
 docker compose up -d
 ```
 
-Go to https://<hostname> and log in with the credentials of your admin account.
+Go to https://hostname and log in with the credentials of your admin account.
 
 ## Manual Install
 
@@ -31,7 +36,7 @@ git clone -j8 --recurse-submodules https://github.com/avorus-soft/avorus
 cd avorus
 ```
 
-### 2. [Set up environment variables](docs/install/ENV_SETUP.md)
+### 2. [Set up environment variables](ENV_SETUP.md)
 
 ```bash
 ./install/env_setup.sh

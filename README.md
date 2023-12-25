@@ -1,5 +1,13 @@
 # Avorus
 
+## Quick Start
+
+For installation details, refer to the [Installation Guide](docs/install/README.md).
+
+## Additional Documentation
+
+For setting up individual components such as NetBox and probes, see the respective sections within the [docs/](docs) directory.
+
 ## Introduction
 
 Avorus is a comprehensive software suite designed to bring advanced control and oversight to networked AV and digital media infrastructures. Crafted with attention to detail and a focus on functionality, Avorus addresses the technical demands of managing sizable installations with ease and precision.
