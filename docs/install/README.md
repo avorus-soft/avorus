@@ -11,10 +11,10 @@
 Run this snippet and follow the prompts that appear on screen:
 
 > The automatic installer requires `git` and `jq`.<br>
-> If you are using a Debian-like distribution, install these by running:<br> > `sudo apt update && sudo apt install git jq`
+> If you are using a Debian-like distribution, install these by running:<br>`sudo apt update && sudo apt install git jq`
 
 ```bash
-curl -sO https://github.com/avorus-soft/avorus/install/install.sh
+curl -sOL https://github.com/avorus-soft/avorus/install/install.sh
 chmod +x install.sh
 ./install.sh
 ```
