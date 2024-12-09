@@ -2,7 +2,12 @@
 
 # Generate a 32 character random string
 generate_random_string() {
-  cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 32
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: use /dev/urandom with xxd for better randomness
+    xxd -l 16 -p /dev/urandom | tr -d '\n'
+  else
+    cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 32
+  fi
 }
 
 # Get the FQDN of the system running the script
@@ -41,23 +46,36 @@ fi
 # Create .env file from .env.example
 cp .env.example .env
 
+# Check the operating system
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS uses sed with a backup extension
+  SED_CMD="sed -i ''"
+else
+  # Linux uses sed without a backup extension
+  SED_CMD="sed -i"
+fi
+
 # Replace placeholders with actual values
-sed -i "s|# MONGO_INITDB_HOSTNAME=|MONGO_INITDB_HOSTNAME=${fqdn}|g" .env
-sed -i "s|# MONGO_INITDB_DATABASE=avorus|MONGO_INITDB_DATABASE=avorus|g" .env
-sed -i "s|# MONGO_INITDB_USERNAME=avorus|MONGO_INITDB_USERNAME=avorus|g" .env
-sed -i "s|# MONGO_INITDB_PASSWORD=|MONGO_INITDB_PASSWORD=$(generate_random_string)|g" .env
-sed -i "s|# MQTT_HOSTNAME=|MQTT_HOSTNAME=${fqdn}|g" .env
-sed -i "s|# API_HOSTNAME=|API_HOSTNAME=${fqdn}|g" .env
-sed -i "s|# API_SECRET=|API_SECRET=$(generate_random_string)|g" .env
-sed -i "s|# API_SYSTEM_USERNAME=|API_SYSTEM_USERNAME=system@${fqdn}|g" .env
-sed -i "s|# API_SYSTEM_PASSWORD=|API_SYSTEM_PASSWORD=$(generate_random_string)|g" .env
-sed -i "s|# NETBOX_API_URL=|NETBOX_API_URL=${netbox_url}|g" .env
-sed -i "s|# NETBOX_API_TOKEN=|NETBOX_API_TOKEN=${token}|g" .env
-sed -i "s|# KNX_GATEWAY_IP=|KNX_GATEWAY_IP=${knx_gateway_ip}|g" .env
-sed -i "s|# KNXKEYS_FILE_PATH=|KNXKEYS_FILE_PATH=${knxkeys_file_path}|g" .env
-sed -i "s|# KNXKEYS_PASSWORD=|KNXKEYS_PASSWORD=${knxkeys_password}|g" .env
-sed -i "s|# PJLINK_PASSWORD=|PJLINK_PASSWORD=${pjlink_password}|g" .env
-sed -i "s|# PDU_COMMUNITYSTRING=|PDU_COMMUNITYSTRING=$(generate_random_string)|g" .env
-sed -i "s|# FAC_COMMUNITYSTRING=|FAC_COMMUNITYSTRING=$(generate_random_string)|g" .env
+$SED_CMD "s|# MONGO_INITDB_HOSTNAME=|MONGO_INITDB_HOSTNAME=${fqdn}|g" .env
+$SED_CMD "s|# MONGO_INITDB_DATABASE=avorus|MONGO_INITDB_DATABASE=avorus|g" .env
+$SED_CMD "s|# MONGO_INITDB_USERNAME=avorus|MONGO_INITDB_USERNAME=avorus|g" .env
+$SED_CMD "s|# MONGO_INITDB_PASSWORD=|MONGO_INITDB_PASSWORD=$(generate_random_string)|g" .env
+$SED_CMD "s|# MQTT_HOSTNAME=|MQTT_HOSTNAME=${fqdn}|g" .env
+$SED_CMD "s|# API_HOSTNAME=|API_HOSTNAME=${fqdn}|g" .env
+$SED_CMD "s|# API_SECRET=|API_SECRET=$(generate_random_string)|g" .env
+$SED_CMD "s|# API_SYSTEM_USERNAME=|API_SYSTEM_USERNAME=system@${fqdn}|g" .env
+$SED_CMD "s|# API_SYSTEM_PASSWORD=|API_SYSTEM_PASSWORD=$(generate_random_string)|g" .env
+$SED_CMD "s|# NETBOX_API_URL=|NETBOX_API_URL=${netbox_url}|g" .env
+$SED_CMD "s|# NETBOX_API_TOKEN=|NETBOX_API_TOKEN=${token}|g" .env
+$SED_CMD "s|# KNX_GATEWAY_IP=|KNX_GATEWAY_IP=${knx_gateway_ip}|g" .env
+$SED_CMD "s|# KNXKEYS_FILE_PATH=|KNXKEYS_FILE_PATH=${knxkeys_file_path}|g" .env
+$SED_CMD "s|# KNXKEYS_PASSWORD=|KNXKEYS_PASSWORD=${knxkeys_password}|g" .env
+$SED_CMD "s|# PJLINK_PASSWORD=|PJLINK_PASSWORD=${pjlink_password}|g" .env
+$SED_CMD "s|# PDU_COMMUNITYSTRING=|PDU_COMMUNITYSTRING=$(generate_random_string)|g" .env
+$SED_CMD "s|# FAC_COMMUNITYSTRING=|FAC_COMMUNITYSTRING=$(generate_random_string)|g" .env
+
+if [ -e ".env''" ]; then
+  rm ".env''"
+fi
 
 echo ".env file has been created."
