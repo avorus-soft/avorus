@@ -55,8 +55,6 @@ services:
       - ./backend/api:/api
       - ./backend/mkcert/certs/mqtt:/opt/tls
       - ./backend/mkcert/certs:/opt/certs
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     network_mode: host
     command: uvicorn app:app --reload --host 0.0.0.0 --port 80 --port 443 --ssl-keyfile /opt/certs/${API_HOSTNAME}+2-key.pem --ssl-certfile /opt/certs/${API_HOSTNAME}+2.pem
     restart: always
@@ -91,8 +89,6 @@ services:
       - ./backend/manager:/app
       - ./backend/mkcert/certs/mqtt:/opt/tls
       - ./backend/mkcert/certs/rootCA.pem:/opt/rootCA.pem
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     network_mode: host
     privileged: true
     command: python3 /app/app.py
@@ -115,8 +111,6 @@ services:
     volumes:
       - ./backend/calendar:/app
       - ./backend/mkcert/certs/mqtt:/opt/tls
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     network_mode: host
     command: python3 /app/app.py
     restart: always
