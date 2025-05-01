@@ -8,7 +8,5 @@ services:
       - API_HOSTNAME=$API_HOSTNAME
       - CN=$MQTT_HOSTNAME
     volumes:
-      - ./backend/mkcert/certs:/root
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - ./backend/mkcert/certs:/root/certs
     command: /mkcerts.sh
